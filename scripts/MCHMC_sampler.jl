@@ -140,10 +140,12 @@ samples_MCHMC = Sample(spl, target, n_steps, init_params=PF_start_θ, dialog=tru
 MPI.Barrier(comm)
 MCHMC_t = time() - t0
 
-npzwrite("MPI_chains/$(MCHMC_prefix)_mask_MCHMC_nside_$nside.npy", samples_MCHMC)
+chain_path = ""
+
+npzwrite("$(chain_path)/$(MCHMC_prefix)_mask_MCHMC_nside_$nside.npy", samples_MCHMC)
 
 MCHMC_ess, MCHMC_rhat = Summarize(samples_MCHMC')
-npzwrite("MPI_chains/$(MCHMC_prefix)_mask_MCHMC_EssRhat_nside_$nside.npy", [MCHMC_ess MCHMC_rhat])
-npzwrite("MPI_chains/$(MCHMC_prefix)_mask_MCHMC_SumPerf_nside_$nside.npy", [MCHMC_t mean(MCHMC_ess) median(MCHMC_rhat)])
+npzwrite("$(chain_path)/$(MCHMC_prefix)_mask_MCHMC_EssRhat_nside_$nside.npy", [MCHMC_ess MCHMC_rhat])
+npzwrite("$(chain_path)/$(MCHMC_prefix)_mask_MCHMC_SumPerf_nside_$nside.npy", [MCHMC_t mean(MCHMC_ess) median(MCHMC_rhat)])
 
 MPI.Finalize()
