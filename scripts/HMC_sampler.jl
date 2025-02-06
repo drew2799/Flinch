@@ -145,11 +145,13 @@ samples_HMC, stats_HMC = sample(ham, kernel, PF_start_θ, n_samples, adaptor, n_
 MPI.Barrier(comm)
 HMC_t = time() - t0
 
-npzwrite("MPI_chains/$(HMC_prefix)_mask_HMC_nside_$nside.npy", reduce(hcat, samples_HMC))
-npzwrite("MPI_chains/$(HMC_prefix)_mask_HMC_stats_nside_$nside.npy", [[stats_HMC[i][:log_density] for i in 1:1_000] [stats_HMC[i][:hamiltonian_energy] for i in 1:1_000]])
+chain_path = ""
+
+npzwrite("$(chain_path)/$(HMC_prefix)_mask_HMC_nside_$nside.npy", reduce(hcat, samples_HMC))
+npzwrite("$(chain_path)/$(HMC_prefix)_mask_HMC_stats_nside_$nside.npy", [[stats_HMC[i][:log_density] for i in 1:1_000] [stats_HMC[i][:hamiltonian_energy] for i in 1:1_000]])
 
 HMC_ess, HMC_rhat = Summarize(samples_HMC)
-npzwrite("MPI_chains/$(HMC_prefix)_mask_HMC_EssRhat_nside_$nside.npy", [HMC_ess HMC_rhat])
-npzwrite("MPI_chains/$(HMC_prefix)_mask_HMC_SumPerf_nside_$nside.npy", [HMC_t mean(HMC_ess) median(HMC_rhat)])
+npzwrite("$(chain_path)/$(HMC_prefix)_mask_HMC_EssRhat_nside_$nside.npy", [HMC_ess HMC_rhat])
+npzwrite("$(chain_path)/$(HMC_prefix)_mask_HMC_SumPerf_nside_$nside.npy", [HMC_t mean(HMC_ess) median(HMC_rhat)])
 
 MPI.Finalize()
