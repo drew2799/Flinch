@@ -145,11 +145,13 @@ samples_NUTS, stats_NUTS = sample(ham, kernel, PF_start_θ, n_samples, adaptor, 
 MPI.Barrier(comm)
 NUTS_t = time() - t0
 
-npzwrite("MPI_chains/$(NUTS_prefix)_mask_NUTS_nside_$nside.npy", reduce(hcat, samples_NUTS))
-npzwrite("MPI_chains/$(NUTS_prefix)_mask_NUTS_stats_nside_$nside.npy", reduce(vcat, [[stats_NUTS[i][:log_density] for i in 1:1_000] [stats_NUTS[i][:hamiltonian_energy] for i in 1:1_000] [stats_NUTS[i][:tree_depth] for i in 1:1_000]]))
+chain_path = ""
+
+npzwrite("$(chain_path)/$(NUTS_prefix)_mask_NUTS_nside_$nside.npy", reduce(hcat, samples_NUTS))
+npzwrite("$(chain_path)/$(NUTS_prefix)_mask_NUTS_stats_nside_$nside.npy", reduce(vcat, [[stats_NUTS[i][:log_density] for i in 1:1_000] [stats_NUTS[i][:hamiltonian_energy] for i in 1:1_000] [stats_NUTS[i][:tree_depth] for i in 1:1_000]]))
 
 NUTS_ess, NUTS_rhat = Summarize(samples_NUTS)
-npzwrite("MPI_chains/$(NUTS_prefix)_mask_NUTS_EssRhat_nside_$nside.npy", [NUTS_ess NUTS_rhat])
-npzwrite("MPI_chains/$(NUTS_prefix)_mask_NUTS_SumPerf_nside_$nside.npy", [NUTS_t mean(NUTS_ess) median(NUTS_rhat)])
+npzwrite("$(chain_path)/$(NUTS_prefix)_mask_NUTS_EssRhat_nside_$nside.npy", [NUTS_ess NUTS_rhat])
+npzwrite("$(chain_path)/$(NUTS_prefix)_mask_NUTS_SumPerf_nside_$nside.npy", [NUTS_t mean(NUTS_ess) median(NUTS_rhat)])
 
 MPI.Finalize()
